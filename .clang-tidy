@@ -1,0 +1,279 @@
+# Configure clang-tidy for this project.
+
+# Here is an explanation for why some of the checks are disabled:
+#
+#  -bugprone-easily-swappable-parameters: Disabled due to generating too many false positives in
+#    legacy code.
+#
+#  -bugprone-exception-escape: Disabled because exceptions are not used in the codebase, making this
+#    check irrelevant and potentially confusing if it were to trigger any warnings.
+#
+#  -bugprone-implicit-widening-of-multiplication-result: Disabled because it triggers errors
+#    frequently in benign expressions like `2 * variable` or when casting types in multiplications,
+#    e.g., `long x = a_int * b_int;`.
+#
+#  -bugprone-macro-parentheses: Disabled because Clang-Tidy incorrectly handles macro expansions
+#    leading to misleading warnings.
+#
+#  -bugprone-narrowing-conversions: Superseded by customized checks in
+#    cppcoreguidelines-narrowing-conversions for better control.
+#
+#  -bugprone-reserved-identifier: Disabled due to significant performance overhead, accounting
+#    for 12-20% of the total execution time during analysis.
+#
+#  -clang-analyzer-deadcode.DeadStores: We have are compiler warning for that.
+#
+#  -cppcoreguidelines-avoid-c-arrays: We use them in many parts of code.
+#
+#  -cppcoreguidelines-avoid-magic-numbers: It's highly depend on context of usage such numbers.
+#
+#  -cppcoreguidelines-avoid-non-const-global-variables: Currently unavoidable as the project uses
+#    many non-const global variables.
+#
+#  -cppcoreguidelines-owning-memory: Not applicable as we do not use the GSL library, which is
+#    required for this guideline.
+#
+#  -cppcoreguidelines-pro-bounds-array-to-pointer-decay: Too many false positives that affect
+#    readability without adding safety.
+#
+#  -cppcoreguidelines-pro-bounds-constant-array-index: Not applicable as the project lacks a similar
+#    API to gsl::at(), which is needed to enforce this guideline.
+#
+#  -cppcoreguidelines-pro-bounds-pointer-arithmetic: Generates excessive false positives especially
+#    in legacy code dealing with C-string manipulations.
+#
+#  -cppcoreguidelines-pro-type-const-cast: Disabled because existing code makes use of const_cast in
+#    a controlled manner which is reviewed and accepted in specific scenarios.
+#
+#  -cppcoreguidelines-pro-type-reinterpret-cast: Disabled to allow for low-level memory manipulation
+#    tasks that are necessary in the current code base, especially in older or performance-critical
+#    sections.
+#
+#  -cppcoreguidelines-pro-type-static-cast-downcast: Disabled due to extensive use of static_cast
+#    for downcasting in polymorphic types, where it's used knowingly and safely.
+#
+#  -cppcoreguidelines-pro-type-union-access: Disabled as unions are used for intentional
+#    type-punning in legacy code, which is necessary for interfacing with certain hardware or
+#    external libraries.
+#
+#  -cppcoreguidelines-pro-type-vararg: Necessary due to the extensive use of legacy macros that
+#    utilize variadic arguments.
+#
+#  -misc-non-private-member-variables-in-classes: See explanation under
+#    cppcoreguidelines-non-private-member-variables-in-classes.
+#
+#  -misc-unused-parameters: Currently unavoidable, too many instances in existing codebase, and
+#    fixing them has a low priority compared to other tasks.
+#
+#  -modernize-avoid-c-arrays: Replaced by cppcoreguidelines-avoid-c-arrays which provides more
+#    nuanced control.
+#
+#  -modernize-return-braced-init-list: Disabled as it may reduce readability by removing explicit
+#    typenames in favor of braced initialization lists.
+#
+#  -modernize-use-trailing-return-type: Found to reduce code readability by inverting the
+#    traditional function signature style.
+#
+#  -readability-container-contains: Disabled because the C++20 STL library is not available on all
+#    platforms used in this project.
+#
+#  -readability-convert-member-functions-to-static: Disabled as it often suggests changes that
+#    conflict with the design intentions where member functions need access to instance state even
+#    if they currently do not use them.
+#
+#  -readability-identifier-length: Generates excessive warnings in a codebase with established
+#    naming conventions.
+#
+#  -readability-implicit-bool-conversion: Widely used in the current codebase; removing it would
+#    require extensive refactoring.
+#
+#  -readability-magic-numbers: Superseded by cppcoreguidelines-avoid-magic-numbers for more specific
+#    control.
+#
+#  -readability-static-accessed-through-instance: Necessary due to the design pattern where
+#    singletons are treated as static instances, leading to this warning when methods are called.
+#
+#  -readability-uppercase-literal-suffix: Considered unnecessary as it does not significantly
+#    enhance readability and is inconsistent with existing practices.
+#
+#  -readability-use-anyofallof: Disabled because the C++20 STL library is not available on all
+#    platforms used in this project.
+#
+Checks: >
+  -*,
+  bugprone-*,
+  cert-flp30-c,cert-oop57-cpp,cert-oop58-cpp,
+  clang-analyzer-*,
+  clang-diagnostic-*,
+  cppcoreguidelines-*,
+  google-*,
+  misc-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-exception-escape,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -bugprone-macro-parentheses,
+  -bugprone-narrowing-conversions,
+  -bugprone-reserved-identifier,
+  -clang-analyzer-deadcode.DeadStores,
+  -clang-diagnostic-unused-*,
+  -cppcoreguidelines-avoid-c-arrays,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-const-cast,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-static-cast-downcast,
+  -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-pro-type-vararg,
+  -misc-header-include-cycle,
+  -misc-include-cleaner,
+  -misc-non-private-member-variables-in-classes,
+  -misc-unused-parameters,
+  -modernize-avoid-c-arrays,
+  -modernize-use-trailing-return-type,
+  -readability-container-contains,
+  -readability-convert-member-functions-to-static,
+  -readability-function-cognitive-complexity,
+  -readability-identifier-length,
+  -readability-implicit-bool-conversion,
+  -readability-magic-numbers,
+  -readability-uppercase-literal-suffix,
+  -readability-use-anyofallof,
+
+  -cppcoreguidelines-macro-usage
+
+FormatStyle: file
+
+WarningsAsErrors: >
+  *,
+  -cppcoreguidelines-avoid-do-while,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -cppcoreguidelines-macro-to-enum,
+  -cppcoreguidelines-special-member-functions,
+  -cppcoreguidelines-pro-type-member-init,
+  -clang-analyzer-optin.cplusplus.VirtualCall,
+  -cppcoreguidelines-prefer-member-initializer,
+  -bugprone-dynamic-static-initializers,
+  -bugprone-not-null-terminated-result,
+  -clang-analyzer-security*,
+  -cppcoreguidelines-init-variables,
+  -cppcoreguidelines-narrowing-conversions,
+  -cppcoreguidelines-pro-type-cstyle-cast,
+  -clang-diagnostic-c99-designator,
+  -modernize-deprecated-headers,
+  -modernize-macro-to-enum,
+  -modernize-use-using,
+  -readability-braces-around-statements,
+  -readability-isolate-declaration,
+  -readability-redundant-inline-specifier,
+  -google-runtime-int,
+  -google-default-arguments
+
+HeaderFilterRegex: ".*/(common|apps|tests)/"
+
+CheckOptions:
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnoredIntegerValues
+    value: 1; 2; 3; 4; 5; 10; 24; 255
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnoredFloatingPointValues
+    value: 1.0; 100.0; 255.0
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnorePowersOf2IntegerValues
+    value: true
+  - key: cppcoreguidelines-macro-usage.AllowedRegexp
+    value: ^(STAROS_LOG_TAG|CONFIG_[A-Z\d_]+|EXPECT_[A-Z\d_]+|ASSERT_[A-Z\d_]+)$
+  - key: cppcoreguidelines-narrowing-conversions.IgnoreConversionFromTypes
+    value: size_t;ptrdiff_t;size_type;difference_type
+  - key: cppcoreguidelines-narrowing-conversions.WarnOnIntegerToFloatingPointNarrowingConversion
+    value: false
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value: true
+  - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted
+    value: true
+  - key: cppcoreguidelines-pro-type-member-init.IgnoreArrays
+    value: true
+  - key: misc-const-correctness.AnalyzeValues
+    value: false
+  - key: misc-const-correctness.TransformValues
+    value: false
+  - key: modernize-loop-convert.UseCxx20ReverseRanges
+    value: false
+  - key: performance-unnecessary-value-param.AllowedTypes
+    value: ^std::shared_ptr
+
+  # tuning cognitive complexity
+  - key: readability-function-cognitive-complexity.Threshold
+    value: 25
+  - key: readability-function-cognitive-complexity.IgnoreMacros
+    value: true
+  - key: readability-function-cognitive-complexity.DescribeBasicIncrements
+    value: false
+
+  # Google Code Style
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
+
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+#  - key: readability-identifier-naming.ClassMemberSuffix
+#    value: _
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+#  - key: readability-identifier-naming.TemplateParameterCase
+#    value: CamelCase
+#  - key: readability-identifier-naming.ValueTemplateParameterIgnoredRegexp
+#    value: .+Func
+#  - key: readability-identifier-naming.ValueTemplateParameterPrefix
+#    value: k
+#  - key: readability-identifier-naming.ValueTemplateParameterCase
+#    value: CamelCase
+#  - key: readability-identifier-naming.FunctionIgnoredRegexp
+#    value: .+_Test
+#  - key: readability-identifier-naming.FunctionCase
+#    value: CamelCase
+#  - key: readability-identifier-naming.EnumCase
+#    value: CamelCase
+#  - key: readability-identifier-naming.MethodIgnoredRegexp
+#    value: capacity|empty|full|size|max_size|pop|push|available|data|c?begin|c?end|front|back|at
+#  - key: readability-identifier-naming.MethodCase
+#    value: CamelCase
+#  - key: readability-identifier-naming.TypeAliasCase
+#    value: CamelCase
+#  - key: readability-identifier-naming.TypedefCase
+#    value: CamelCase
+
+  # This style should be applied to constants with static storage duration
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: CamelCase
+  - key: readability-identifier-naming.ConstexprVariablePrefix
+    value: k
+  - key: readability-identifier-naming.StaticConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.StaticConstantPrefix
+    value: k
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: k
+  - key: readability-identifier-naming.EnumConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumConstantPrefix
+    value: k
+
+#  - key: readability-identifier-naming.ParameterCase
+#    value: lower_case
+#  - key: readability-identifier-naming.VariableCase
+#    value: lower_case
+
+#  # Workaround of tidy parsing C++20 (fixed in tidy 17)
+#  - key: readability-identifier-naming.TypeTemplateParameterIgnoredRegexp
+#    value: expr-type

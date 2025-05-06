@@ -1,0 +1,28 @@
+BasedOnStyle: Google
+ColumnLimit: 120
+IndentWidth: 4
+---
+Language: Cpp
+Standard: c++20
+AllowShortFunctionsOnASingleLine: InlineOnly
+BinPackArguments: false
+DerivePointerAlignment: false
+InsertBraces: true
+
+IncludeBlocks: Regroup
+IncludeCategories:
+  # Headers in <> without extension
+  - Regex:           '<([-A-Za-z0-9_])+>'
+    Priority:        3
+  # Headers in <> from external libraries and some system headers
+  - Regex:           '<[-A-Za-z0-9_]+\/'
+    SortPriority:    1
+    Priority:        2
+  # Headers in <> with extension. System headers
+  - Regex:           '<[-A-Za-z0-9_]+\.'
+    Priority:        2
+  # Headers in ""
+  - Regex:           '"([-A-Za-z0-9_])+'
+    Priority:        1
+---
+Language: Proto
