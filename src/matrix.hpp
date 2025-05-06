@@ -15,9 +15,20 @@ class ElementAllocator<std::pair<size_t, T>> {
 
 template <typename T, T default_value, size_t order = 2>
 class Matrix {
+    using SubType = Matrix<T, default_value, order - 1>;
+
    public:
+    SubType& operator[](size_t idx) { return rows_[idx]; }
+    [[nodiscard]] size_t size() const {
+        size_t sum = 0;
+        for (const auto& e : rows_) {
+            sum += e.second.size();
+        }
+        return sum;
+    }
+
    private:
-    Matrix<T, default_value, order - 1> rows;
+    std::map<size_t, SubType> rows_;
 };
 
 template <typename T, T default_value>
@@ -25,11 +36,14 @@ class EProxy {
    public:
     EProxy(std::map<size_t, T>& map, size_t idx)
         : map_{map}, idx_{idx}, v_{map_.contains(idx) ? map_[idx] : default_value} {
-        std::cout << "EPROXY CTOR" << std::endl;
+        // std::cout << "EPROXY CTOR" << std::endl;
     }
 
+    EProxy(const EProxy& o) = delete;
+    EProxy& operator=(const EProxy& o) = delete;
+
     ~EProxy() {
-        std::cout << "EPROXY DTOR" << std::endl;
+        // std::cout << "EPROXY DTOR" << std::endl;
         if (default_value == v_) {
             std::cout << "erase" << std::endl;
             map_.erase(idx_);
@@ -59,11 +73,10 @@ class Matrix<T, default_value, 1> {
    public:
     [[nodiscard]] size_t size() const { return els_.size(); }
 
-    ProxyType operator[](size_t idx) { return ProxyType{els_, idx}; }
+    ProxyType operator[](size_t idx) { return {els_, idx}; }
 
-    T operator[](size_t idx) const { return els_.contains(idx) ? els_[idx] : default_value; }
+    // const T& operator[](size_t idx) const { return els_.contains(idx) ? els_.find(idx)->second : default_value; }
 
    private:
-    // using alloc = my_allocator<std::pair<const size_t, T>>;
     std::map<size_t, T> els_{};  // matrix elements container
 };
