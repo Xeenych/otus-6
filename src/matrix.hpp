@@ -1,8 +1,8 @@
-#include "my_allocator.hpp"
+#pragma once
 
 #include <cstddef>
+#include <iostream>
 #include <map>
-#include <memory>
 
 template <typename T>
 class ElementAllocator;
@@ -18,6 +18,17 @@ class Matrix {
     using SubType = Matrix<T, default_value, order - 1>;
 
    public:
+    class Iterator {
+        public:
+        private:
+    };
+
+
+    using Iterator = std::map<size_t, SubType>::iterator;
+
+    Iterator begin() { return rows_.begin(); }
+    Iterator end() { return rows_.end(); }
+
     SubType& operator[](size_t idx) { return rows_[idx]; }
     [[nodiscard]] size_t size() const {
         size_t sum = 0;

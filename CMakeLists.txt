@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#set(CMAKE_GENERATOR "Ninja")
+#set(CMAKE_GENERATOR "Unix Makefiles" CACHE INTERNAL "" FORCE)
+
 
 project(otus-6 LANGUAGES CXX)
 #add_compile_options(-Werror)

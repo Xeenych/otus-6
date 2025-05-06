@@ -1,0 +1,9 @@
+{
+    "clangd.arguments": [
+        "--compile-commands-dir=build",
+        "--query-driver=**/**-gcc,**/**-g++",
+        "--enable-config",
+        "--background-index"
+    ],
+    "clangd.onConfigChanged": "restart"
+}
