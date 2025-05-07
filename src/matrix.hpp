@@ -67,8 +67,9 @@ class Matrix<T, default_value, 1> {
 
     ProxyType operator[](size_t key) { return {els_, key}; }
 
-    auto begin() { return els_.begin(); }
-    auto end() { return els_.end(); }
+    // Здесь не очень честно, потому что при записи элемента по итератору default_value не освободит память
+    auto begin() const { return els_.cbegin(); }
+    auto end() const { return els_.cend(); }
 
     // const T& operator[](size_t idx) const { return els_.contains(idx) ? els_.find(idx)->second : default_value; }
 
