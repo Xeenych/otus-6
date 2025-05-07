@@ -21,6 +21,12 @@ int main() {
         matrix[100] = kDefaultValue;
         assert(kDefaultValue == matrix[100]);
         assert(0 == matrix.size());
+
+        (matrix[101] = 1) = 3;
+        matrix[102] = 2;
+        for (auto e : matrix) {
+            std::cout << e.first << " " << e.second << " " << std::endl;
+        }
     }
 
     // M2
@@ -40,6 +46,14 @@ int main() {
         matrix[100][100] = kDefaultValue;
         assert(kDefaultValue == matrix[100][100]);
         assert(0 == matrix.size());
+
+        matrix[101][101] = 1;
+        matrix[102][102] = 2;
+        /*
+        for (auto e : matrix) {
+            std::cout << e.first << " " << e.second << " " << std::endl;
+        }
+        */
     }
 
     /*

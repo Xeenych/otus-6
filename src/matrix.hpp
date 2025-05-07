@@ -9,8 +9,7 @@
 template <typename T, T default_value>
 class EProxy {
    public:
-    EProxy(std::map<size_t, T>& map, size_t idx, typename std::map<size_t, T>::iterator it)
-        : map_{map}, idx_{idx}, iter_{it} {
+    EProxy(std::map<size_t, T>& map, size_t idx) : map_{map}, idx_{idx} {
         // std::cout << "EPROXY CTOR" << std::endl;
     }
 
@@ -38,7 +37,6 @@ class EProxy {
    private:
     std::map<size_t, T>& map_;
     const size_t idx_;
-    typename std::map<size_t, T>::iterator iter_;
 };
 
 template <typename T, T default_value, size_t order = 2>
@@ -67,10 +65,11 @@ class Matrix<T, default_value, 1> {
    public:
     [[nodiscard]] size_t size() const { return els_.size(); }
 
-    ProxyType operator[](size_t key) { return {els_, key, els_.find(key)}; }
+    ProxyType operator[](size_t key) { return {els_, key}; }
 
-    ProxyType begin() { return {els_, 0, els_.begin()}; }
-    ProxyType end() { return {els_, els_.size(), els_.end()}; }
+    // Здесь не очень честно, потому что при записи элемента по итератору default_value не освободит память
+    auto begin() const { return els_.cbegin(); }
+    auto end() const { return els_.cend(); }
 
     // const T& operator[](size_t idx) const { return els_.contains(idx) ? els_.find(idx)->second : default_value; }
 
