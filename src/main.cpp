@@ -21,6 +21,9 @@ int main() {
         matrix[100] = kDefaultValue;
         assert(kDefaultValue == matrix[100]);
         assert(0 == matrix.size());
+
+
+        auto b = matrix.begin();
     }
 
     // M2
