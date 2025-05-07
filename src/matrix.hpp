@@ -3,14 +3,42 @@
 #include <cstddef>
 #include <iostream>
 #include <map>
+#include <mutex>
+#include <xutility>
 
-template <typename T>
-class ElementAllocator;
-
-template <typename T>
-class ElementAllocator<std::pair<size_t, T>> {
+template <typename T, T default_value>
+class EProxy {
    public:
-    using value_type = std::pair<size_t, T>;
+    EProxy(std::map<size_t, T>& map, size_t idx, typename std::map<size_t, T>::iterator it)
+        : map_{map}, idx_{idx}, iter_{it} {
+        // std::cout << "EPROXY CTOR" << std::endl;
+    }
+
+    EProxy(const EProxy& o) = delete;
+    EProxy& operator=(const EProxy& o) = delete;
+
+    operator T() { return map_.contains(idx_) ? map_[idx_] : default_value; }
+
+    EProxy<T, default_value>& operator=(const T& o) {
+        (default_value == o) ? map_.erase(idx_) : map_[idx_] = o;
+        return *this;
+    }
+
+    /*
+    EProxy<T, default_value> next() const {
+        auto n = std::next(iter_);
+        return EProxy<T, default_value>{map_, idx_ + 1, n};
+    }
+    */
+    // T operator*() { return map_.contains(idx_) ? map_[idx_] : default_value; }
+    // EProxy<T, default_value> operator++() { return next(); }
+    // bool operator==(const EProxy<T, default_value>& o) { return map_ == o.map_ && idx_ == o.idx_; }
+    // bool operator!=(const EProxy<T, default_value>& o) { return !operator==(o); }
+
+   private:
+    std::map<size_t, T>& map_;
+    const size_t idx_;
+    typename std::map<size_t, T>::iterator iter_;
 };
 
 template <typename T, T default_value, size_t order = 2>
@@ -18,18 +46,8 @@ class Matrix {
     using SubType = Matrix<T, default_value, order - 1>;
 
    public:
-    class Iterator {
-        public:
-        private:
-    };
-
-
-    using Iterator = std::map<size_t, SubType>::iterator;
-
-    Iterator begin() { return rows_.begin(); }
-    Iterator end() { return rows_.end(); }
-
     SubType& operator[](size_t idx) { return rows_[idx]; }
+
     [[nodiscard]] size_t size() const {
         size_t sum = 0;
         for (const auto& e : rows_) {
@@ -43,51 +61,30 @@ class Matrix {
 };
 
 template <typename T, T default_value>
-class EProxy {
-   public:
-    EProxy(std::map<size_t, T>& map, size_t idx)
-        : map_{map}, idx_{idx}, v_{map_.contains(idx) ? map_[idx] : default_value} {
-        // std::cout << "EPROXY CTOR" << std::endl;
-    }
-
-    EProxy(const EProxy& o) = delete;
-    EProxy& operator=(const EProxy& o) = delete;
-
-    ~EProxy() {
-        // std::cout << "EPROXY DTOR" << std::endl;
-        if (default_value == v_) {
-            std::cout << "erase" << std::endl;
-            map_.erase(idx_);
-        } else {
-            std::cout << "set:" << v_ << std::endl;
-            map_[idx_] = v_;
-        }
-    }
-
-    operator int&() { return v_; }
-
-    EProxy<T, default_value>& operator=(int o) {
-        v_ = o;
-        return *this;
-    }
-
-   private:
-    std::map<size_t, T>& map_;
-    const size_t idx_;
-    int v_;
-};
-
-template <typename T, T default_value>
 class Matrix<T, default_value, 1> {
     using ProxyType = EProxy<T, default_value>;
 
    public:
     [[nodiscard]] size_t size() const { return els_.size(); }
 
-    ProxyType operator[](size_t idx) { return {els_, idx}; }
+    ProxyType operator[](size_t key) { return {els_, key, els_.find(key)}; }
+
+    ProxyType begin() { return {els_, 0, els_.begin()}; }
+    ProxyType end() { return {els_, els_.size(), els_.end()}; }
 
     // const T& operator[](size_t idx) const { return els_.contains(idx) ? els_.find(idx)->second : default_value; }
 
    private:
     std::map<size_t, T> els_{};  // matrix elements container
+};
+
+template <typename T, size_t order>
+class MatrixIterator {
+    using ContainerType = std::map<size_t, T>;
+
+   public:
+    explicit MatrixIterator(ContainerType& c) : container_{c} {}
+
+   private:
+    ContainerType& container_;
 };
