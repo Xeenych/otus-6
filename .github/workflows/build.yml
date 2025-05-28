@@ -1,0 +1,55 @@
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build-job:
+    name: Build Firmware
+    runs-on: ubuntu-latest
+#   container:
+#      image: xeenych/arm-none-eabi:10.3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build
+        shell: bash
+        run: |
+            mkdir out
+            cd out
+            cmake ..
+            cmake --build .
+            cd ..
+            zip -r out.zip out
+
+#      - name: Upload Artifact
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: ${{ github.ref_name }}
+#          path: out
+      
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            tag_name: ${{ github.run_number }}
+            release_name: Release ${{ github.run_number }}
+            draft: false
+            prerelease: false
+      
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./out.zip
+            asset_name: out.${{ github.run_number }}.zip
+            asset_content_type: application/zip
