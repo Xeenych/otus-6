@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <list>
 
 template <typename Container, typename Container::ValueType default_value>
