@@ -22,6 +22,10 @@ int main() {
 
         std::cout << std::endl;
         std::cout << m.size() << std::endl;
+
+        ((m[100][100] = 314) = 0) = 217;
+
+        std::cout << m[100][100] << std::endl;
     }
 
     return 0;
