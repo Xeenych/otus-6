@@ -147,7 +147,7 @@ Checks: >
   -readability-magic-numbers,
   -readability-uppercase-literal-suffix,
   -readability-use-anyofallof,
-
+  -performance-avoid-endl,
   -cppcoreguidelines-macro-usage
 
 FormatStyle: file
